@@ -63,13 +63,19 @@ function configGraphite()
     local login="${1}"
     local password="${2}"
     local email="${3}"
+    local config="${4}"
 
     printHeader 'CONFIGURING GRAPHITE'
+    if [[ "$(isEmptyString ${config})" = 'false' ]]
+    then
+        echo "with override config files in ${config}"
+    fi
 
-    $(safeMoveFile '/opt/graphite/conf/carbon.conf.example' '/opt/graphite/conf/carbon.conf')
-    $(safeMoveFile '/opt/graphite/conf/storage-schemas.conf.example' '/opt/graphite/conf/storage-schemas.conf')
-    $(safeMoveFile '/opt/graphite/conf/graphite.wsgi.example' '/opt/graphite/conf/graphite.wsgi')
-    $(safeMoveFile '/opt/graphite/webapp/graphite/local_settings.py.example' '/opt/graphite/webapp/graphite/local_settings.py')
+    $(safeMoveFileWithOverride '/opt/graphite/conf/carbon.conf.example' '/opt/graphite/conf/carbon.conf' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/conf/storage-schemas.conf.example' '/opt/graphite/conf/storage-schemas.conf' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/conf/storage-aggregation.conf.example' '/opt/graphite/conf/storage-aggregation.conf' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/conf/graphite.wsgi.example' '/opt/graphite/conf/graphite.wsgi' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/webapp/graphite/local_settings.py.example' '/opt/graphite/webapp/graphite/local_settings.py' $config)
 
     cd '/opt/graphite/webapp/graphite'
     python manage.py syncdb --noinput
@@ -132,6 +138,7 @@ function runInstallation()
     local login="${1}"
     local password="${2}"
     local email="${3}"
+    local config="${4}"
 
     checkRequireRootUser
 
@@ -139,7 +146,7 @@ function runInstallation()
     installGraphite
 
     configApache
-    configGraphite "${login}" "${password}" "${email}"
+    configGraphite "${login}" "${password}" "${email}" "${config}"
     configUpstart
 
     restartServers
@@ -186,6 +193,16 @@ function main()
                 fi
 
                 ;;
+
+            --config)
+                shift
+
+                if [[ ${#} -gt 0 ]]
+                then
+                    local config="$(trimString "${1}")"
+                fi
+
+                ;;
             *)
                 shift
                 ;;
@@ -210,7 +227,17 @@ function main()
         exit 1
     fi
 
-    runInstallation "${login}" "${password}" "${email}"
+    # validate override config directory is valid and exists
+    if [[ "$(isEmptyString ${config})" = 'false' ]]
+    then
+        if [[ ! -d "${config}" ]]
+        then
+            error '\nERROR: invalid config override directory!\n'
+            exit 1
+        fi
+    fi
+    runInstallation "${login}" "${password}" "${email}" "${config}"
 }
 
 main "${@}"
+

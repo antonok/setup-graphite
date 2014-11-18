@@ -88,3 +88,23 @@ function safeMoveFile()
         mv "${sourceFilePath}" "${destinationFilePath}"
     fi
 }
+
+function safeMoveFileWithOverride()
+{
+    local sourceFilePath="${1}"
+    local destinationFilePath="${2}"
+    local overridePath="${3}"
+    if [[ "$(isEmptyString ${overridePath})" = 'false' ]]
+    then
+        local baseFilename=$(basename $destinationFilePath)
+        local overrideFilePath="${overridePath}/${baseFilename}"
+
+        if [[ -f "${overrideFilePath}" ]]
+        then
+            $(safeCopyFile "$overrideFilePath" "$destinationFilePath")
+        else
+            $(safeMoveFile "$sourceFilePath" "$destinationFilePath")
+        fi
+    fi
+
+}
