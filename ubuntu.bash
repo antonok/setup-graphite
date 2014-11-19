@@ -70,10 +70,10 @@ function configGraphite()
         echo "with override config files in ${config}"
     fi
 
-    $(safeMoveFileWithOverride '/opt/graphite/conf/carbon.conf.example' '/opt/graphite/conf/carbon.conf')
-    $(safeMoveFileWithOverride '/opt/graphite/conf/storage-schemas.conf.example' '/opt/graphite/conf/storage-schemas.conf')
-    $(safeMoveFileWithOverride '/opt/graphite/conf/graphite.wsgi.example' '/opt/graphite/conf/graphite.wsgi')
-    $(safeMoveFileWithOverride '/opt/graphite/webapp/graphite/local_settings.py.example' '/opt/graphite/webapp/graphite/local_settings.py')
+    $(safeMoveFileWithOverride '/opt/graphite/conf/carbon.conf.example' '/opt/graphite/conf/carbon.conf' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/conf/storage-schemas.conf.example' '/opt/graphite/conf/storage-schemas.conf' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/conf/graphite.wsgi.example' '/opt/graphite/conf/graphite.wsgi' $config)
+    $(safeMoveFileWithOverride '/opt/graphite/webapp/graphite/local_settings.py.example' '/opt/graphite/webapp/graphite/local_settings.py' $config)
 
     cd '/opt/graphite/webapp/graphite'
     python manage.py syncdb --noinput
