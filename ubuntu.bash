@@ -229,14 +229,12 @@ function main()
     # validate override config directory is valid and exists
     if [[ "$(isEmptyString ${config})" = 'false' ]]
     then
-        echo 'config is specified'
         if [[ ! -d "${config}" ]]
         then
             error '\nERROR: invalid config override directory!\n'
             exit 1
         fi
     fi
-    echo "login: ${login} password: ${password} email ${email} config: ${config}"
     runInstallation "${login}" "${password}" "${email}" "${config}"
 }
 
