@@ -105,6 +105,8 @@ function safeMoveFileWithOverride()
         else
             $(safeMoveFile "$sourceFilePath" "$destinationFilePath")
         fi
+    else
+        $(safeMoveFile "$sourceFilePath" "$destinationFilePath")
     fi
 
 }
