@@ -32,7 +32,7 @@ function installGraphite()
     pip install whisper
     pip install Twisted==11.1.0
     pip install django==1.5
-    pip install django-tagging
+    pip install django-tagging==0.3.4
 }
 
 function configApache()
